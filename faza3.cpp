@@ -12,14 +12,14 @@ private:
 	int* orePeZi;
 public:
 
-	Recolta() :numarSoiuri(0) {
+	Recolta() :numarSoiuri(1) {
 		this->tipCultura = "-";
 		this->cantitate = 0;
 		this->numarZileRecoltare = 0;
 		this->orePeZi = NULL;
 	}
 
-	Recolta(string tipCultura, float cantitate) :numarSoiuri(1) {
+	Recolta(string tipCultura, float cantitate) :numarSoiuri(2) {
 		this->tipCultura = tipCultura;
 		this->cantitate = cantitate;
 		this->numarZileRecoltare = 0;
@@ -121,7 +121,7 @@ public:
 	}
 
 	void afisareRecolta() {
-		cout << endl << "Din cultura de tip " << tipCultura << " ,avand  " << numarSoiuri << " soiuri si avand calitatea de referinta " << calitateDeReferinta << " , a fost recoltata intr-o cantitate de " << cantitate << " kg pe parcursul a " << numarZileRecoltare << " zile. Numarul de ore in care s-a recoltat in toate zilele a fost: " << endl;
+		cout << endl << "Din cultura de tip " << tipCultura << " ,avand  " << numarSoiuri << " soiuri si avand calitatea de referinta " << calitateDeReferinta << " , a fost recoltata intr-o cantitate de " << cantitate << " kg pe parcursul a " << numarZileRecoltare << " zile. Numarul de ore in care s-a recoltat in fiecare zi a fost: " << endl;
 		if (numarZileRecoltare == 0)
 			cout << "-";
 		else
@@ -143,8 +143,9 @@ public:
 	}
 
 	void setTipCultura(string tipCultura) {
-		if (tipCultura.length() > 0)
+		if (tipCultura.length() > 0) {
 			this->tipCultura = tipCultura;
+		}
 	}
 
 	string getTipCultura() {
@@ -167,7 +168,7 @@ public:
 			if (this->orePeZi != NULL) {
 				delete[]orePeZi;
 			}
-			orePeZi = new int[this->numarZileRecoltare];
+			this->orePeZi = new int[numarZileRecoltare];
 			for (int i = 0; i < numarZileRecoltare; i++) {
 				this->orePeZi[i] = ore[i];
 			}
@@ -192,12 +193,12 @@ float getTimpMediuPeZi(const Recolta& recolta) {
 	if (recolta.numarZileRecoltare == 0)
 		return 0;
 	for (int i = 0; i < recolta.numarZileRecoltare; i++)
-		suma = suma + recolta.orePeZi[i];
+		suma += recolta.orePeZi[i];
 	return suma / (float)recolta.numarZileRecoltare;
 }
 
 ostream& operator<<(ostream& out, const Recolta& recolta) {
-	out << endl << "Din cultura de tip " << recolta.tipCultura << " ,avand  " << recolta.numarSoiuri << " soiuri si avand calitatea de referinta " << recolta.calitateDeReferinta << " , a fost recoltata intr-o cantitate de " << recolta.cantitate << " kg pe parcursul a " << recolta.numarZileRecoltare << " zile. Numarul de ore in care s-a recoltat in toate zilele a fost: " << endl;
+	out << endl << "Din cultura de tip " << recolta.tipCultura << " ,avand  " << recolta.numarSoiuri << " soiuri si avand calitatea de referinta " << recolta.calitateDeReferinta << " , a fost recoltata intr-o cantitate de " << recolta.cantitate << " kg pe parcursul a " << recolta.numarZileRecoltare << " zile. Numarul de ore in care s-a recoltat in fiecare zi a fost: " << endl;
 
 	if (recolta.numarZileRecoltare == 0)
 		out << "-";
@@ -209,11 +210,11 @@ ostream& operator<<(ostream& out, const Recolta& recolta) {
 }
 
  istream& operator>>(istream& in, Recolta& recolta) {
-	cout << "\nTip cultura:";
+	cout << "Tip cultura: ";
 	in >> recolta.tipCultura;
-	cout << "\nCantitate:";
+	cout << "Cantitate: ";
 	in >> recolta.cantitate;
-	cout << " \nNumar de zile in care se recolteaza:";
+	cout << "Numar de zile in care se recolteaza: ";
 	in >> recolta.numarZileRecoltare;
 	if (recolta.orePeZi != NULL)
 	{
@@ -222,7 +223,7 @@ ostream& operator<<(ostream& out, const Recolta& recolta) {
 	recolta.orePeZi = new int[recolta.numarZileRecoltare];
 	for (int i = 0; i < recolta.numarZileRecoltare; i++)
 	{
-		cout << "\nOrele de recoltare in ziua" << i + 1 << ": ";
+		cout << "Orele de recoltare in ziua " << i + 1 << ": ";
 		in >> recolta.orePeZi[i];
 
 	}
@@ -241,7 +242,7 @@ private:
 	int* vechimePomi;
 public:
 
-	Livada() :anPlantatie(2023) {
+	Livada() :anPlantatie(2020) {
 		this->tipFructe = "-";
 		this->randamentAnual = 0;
 		this->numarPomi = 0;
@@ -344,10 +345,10 @@ public:
 	float operator()(int start, int stop) {
 		if (start >= 0 && start <= this->numarPomi && stop >= 0 && stop <= numarPomi && start < stop) {
 			int suma = 0;
-			for (int i = start;i<=stop;i++) {
+			for (int i = start;i <= stop;i++) {
 				suma += this->vechimePomi[i];
 			}
-			return suma;
+			return suma/(float)stop;
 		}
 	}
 
@@ -374,8 +375,9 @@ public:
 	}
 
 	void setTipFructe(string tipFructe) {
-		if (tipFructe.length() > 0)
+		if (tipFructe.length() > 0) {
 			this->tipFructe = tipFructe;
+		}
 	}
 
 	string getTipFructe() {
@@ -398,8 +400,8 @@ public:
 			if (this->vechimePomi != NULL) {
 				delete[]vechimePomi;
 			}
-			vechimePomi = new int[this->numarPomi];
-			for (int i = 0; i < numarPomi; i++) {
+			this->vechimePomi = new int[numarPomi];
+			for (int i = 0; i <  numarPomi; i++) {
 				this->vechimePomi[i] = vechime[i];
 			}
 		}
@@ -427,11 +429,11 @@ ostream& operator<<(ostream& out, const Livada& livada) {
 }
 
 istream& operator>>(istream& in, Livada& livada) {
-	cout << "\nTip fructe:";
+	cout << "Tip fructe: ";
 	in >> livada.tipFructe;
-	cout << "\nRandament anual:";
+	cout << "Randament anual: ";
 	in >> livada.randamentAnual;
-	cout << " \nNumar de pomi:";
+	cout << "Numar de pomi: ";
 	in >> livada.numarPomi;
 	if (livada.vechimePomi != NULL)
 	{
@@ -440,7 +442,7 @@ istream& operator>>(istream& in, Livada& livada) {
 	livada.vechimePomi = new int[livada.numarPomi];
 	for (int i = 0; i < livada.numarPomi; i++)
 	{
-		cout << "\nVechimea pomului" << i + 1 << ": ";
+		cout << "Vechimea pomului " << i + 1 << ": ";
 		in >> livada.vechimePomi[i];
 
 	}
@@ -458,7 +460,7 @@ private:
 	string* tipCulturi;
 public:
 
-	Sol() : anPrimaCultura(2023) {
+	Sol() : anPrimaCultura(2020) {
 		this->tipSol = "-";
 		this->fertilitate = "-";
 		this->suprafataCultivata = 0;
@@ -565,11 +567,7 @@ public:
 		}
 	}
 
-	explicit operator float() {
-		return this->suprafataCultivata;
-	}
-
-	explicit operator int() {
+    explicit operator int() {
 		return this->numarCulturi;
 	}
 
@@ -629,10 +627,10 @@ public:
 		if (numarCulturi > 0) {
 			this->numarCulturi = numarCulturi;
 		}
-		if (tipCulturi != NULL) {
+		if (this->tipCulturi != NULL) {
 			delete[]tipCulturi;
 		}
-		tipCulturi = new string[this->numarCulturi];
+		this->tipCulturi = new string[numarCulturi];
 		for (int i = 0; i < numarCulturi; i++) {
 			this->tipCulturi[i] = culturi[i];
 		}
@@ -677,20 +675,20 @@ ostream& operator<<(ostream& out, const Sol& sol) {
 }
 
 istream& operator>>(istream& in, Sol& sol) {
-	cout << "\nTip sol:";
+	cout << "Tip sol: ";
 	in >> sol.tipSol;
-	cout << "\nFertilitate:";
+	cout << "Fertilitate: ";
 	in >> sol.fertilitate;
-	cout << "\nSuprafata cultivata:";
+	cout << "Suprafata cultivata: ";
 	in >> sol.suprafataCultivata;
-	cout << "\nNumar culturi:";
+	cout << "Numar culturi: ";
 	in >> sol.numarCulturi;
 	if (sol.tipCulturi != NULL) {
 		delete[]sol.tipCulturi;
 	}
 	sol.tipCulturi = new string[sol.numarCulturi];
 	for (int i = 0; i < sol.numarCulturi; i++) {
-		cout << "\nTipul culturii" << i + 1 << ": ";
+		cout << "Tipul culturii " << i + 1 << ": ";
 		in >> sol.tipCulturi[i];
 	}
 	return in;
@@ -765,6 +763,18 @@ void main() {
 	cout << recolta4;
 	cout << recolta2;
 
+	int numarRecolte;
+	cout << endl << "Introduceti numarul de recolte: ";
+	cin >> numarRecolte;
+	Recolta* vectorRecolte = new Recolta[numarRecolte];
+	for (int i = 0; i < numarRecolte; i++) {
+		cout << endl << "Detalii recolta " << i + 1 << ":" << endl;
+		cin >> vectorRecolte[i];
+	}
+	for (int i = 0; i < numarRecolte; i++) {
+		cout << vectorRecolte[i] << endl;
+	}
+	delete[]vectorRecolte;
 
 
 
@@ -829,7 +839,22 @@ void main() {
 	cout << livada2;
 	cout << endl << livada2[2] << endl;
 	
-	cout << endl << "Suma vechimii pomilor de la 1 la 3 este:" << livada2(1, 3) << endl;
+	cout << endl << "Media vechimii pomilor de la 1 la 3 este:" << livada2(1, 3) << endl;
+
+	int numarLivezi;
+	cout << endl << "Introduceti numarul de livezi: ";
+	cin >> numarLivezi;
+	Livada* vectorLivezi = new Livada[numarLivezi];
+	for (int i = 0; i < numarLivezi; i++) {
+		cout << endl << "Detalii livada " << i + 1 << ":" << endl;
+		cin >> vectorLivezi[i];
+	}
+	for (int i = 0; i < numarLivezi; i++) {
+		cout << vectorLivezi[i] << endl;
+	}
+	delete[]vectorLivezi;
+
+
 
 	Sol::setPhOptim(6.7);
 
@@ -886,22 +911,49 @@ void main() {
 	else
 		cout << endl << "Solul 2 si solul 3 au aceeasi fertilitate." << endl;
 
+	cout << sol2;
 	cout << endl << sol2[0] << endl;
-	sol2.afisareSol();
 	sol2[0] = "conopida";
 	cout << sol2;
 	cout << endl << sol2[0] << endl;
 
-	float suprafataSol;
-	suprafataSol = (float)sol4;
-	cout << endl << suprafataSol << endl;
 
 	int culturiSol;
 	culturiSol = (int)sol4;
 	cout << endl << culturiSol << endl;
 
-	
+	cout << sol2;
 	sol2 = sol2 + 3.2;
 	cout << sol2;
 	cout << endl << sol2.getSuprafataCultivata() << endl;
+
+	int numarSoluri;
+	cout << endl << "Introduceti numarul de soluri: ";
+	cin >> numarSoluri;
+	Sol* vectorSoluri = new Sol[numarSoluri];
+	for (int i = 0; i < numarSoluri; i++) {
+		cout << endl << "Detalii sol " << i + 1 << ":" << endl;
+		cin >> vectorSoluri[i];
+	}
+	for (int i = 0; i < numarSoluri; i++) {
+		cout << vectorSoluri[i] << endl;
+	}
+	delete[]vectorSoluri;
+
+	const int linii = 2;
+	const int coloane = 2;
+	Sol matriceSol[linii][coloane];
+	for (int i = 0; i < linii; i++) {
+		for (int j = 0; j < coloane; j++) {
+			cout << endl << "Detaliile solului [" << i + 1<< "][" << j + 1 <<"]: " << endl;
+			cin >> matriceSol[i][j];
+		}
+	}
+	for (int i = 0; i < linii; i++) {
+		for (int j = 0; j < coloane; j++) {
+			cout << endl << "Solul [" << i + 1 << "][" << j + 1 << "]: ";
+			cout << matriceSol[i][j] << " ";
+		}
+		cout << endl;
+	}
 }
