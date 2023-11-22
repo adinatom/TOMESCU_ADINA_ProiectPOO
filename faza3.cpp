@@ -175,6 +175,10 @@ public:
 		}
 	}
 
+	int getNrZileRecoltare() {
+		return this->numarZileRecoltare;
+	}
+
 	int* getOrePeZi() {
 		return this->orePeZi;
 	}
@@ -407,6 +411,10 @@ public:
 		}
 	}
 
+	int getNrPomi() {
+		return this->numarPomi;
+	}
+
 	int* getVechimePomi() {
 			return this->vechimePomi;
 	}
@@ -636,6 +644,10 @@ public:
 		}
 	}
 
+	int getNrCulturi() {
+		return this->numarCulturi;
+	}
+
 	string getTipCulturi(int index) {
 		if (index >= 0 && index <= numarCulturi) {
 			return this->tipCulturi[index];
@@ -694,6 +706,132 @@ istream& operator>>(istream& in, Sol& sol) {
 	return in;
 }
 
+class Ferma {
+private:
+	const int id;
+	bool sistemIrigatie;
+	int numarRecolte;
+	Recolta* recolte;
+public:
+
+	Ferma() : id(0) {
+		this->sistemIrigatie = false;
+		this->numarRecolte = 0;
+		this->recolte = NULL;
+	}
+
+	Ferma(int id, bool sistemIrigatie, int numarRecolte, Recolta* recolte) :id(id) {
+		this->sistemIrigatie = sistemIrigatie;
+		this->numarRecolte = numarRecolte;
+		this->recolte = new Recolta[numarRecolte];
+		for (int i = 0; i < numarRecolte; i++) {
+			this->recolte[i] = recolte[i];
+		}
+	}
+
+	Ferma(const Ferma& f) : id(f.id) {
+		this->sistemIrigatie = f.sistemIrigatie;
+		this->numarRecolte = f.numarRecolte;
+		this->recolte = new Recolta[numarRecolte];
+		for (int i = 0; i < numarRecolte; i++) {
+			this->recolte[i] = f.recolte[i];
+		}
+	}
+
+	~Ferma() {
+		if (this->recolte != NULL) {
+			delete[]this->recolte;
+		}
+	}
+
+	Ferma& operator=(const Ferma& f) {
+		if (this != &f) {
+			if (this->recolte != NULL) {
+				delete[]this->recolte;
+			}
+			this->sistemIrigatie = f.sistemIrigatie;
+			this->numarRecolte = f.numarRecolte;
+			this->recolte = new Recolta[numarRecolte];
+			for (int i = 0; i < numarRecolte; i++) {
+				this->recolte[i] = f.recolte[i];
+			}
+		}
+		return *this;
+	}
+
+	Ferma operator+(const Ferma& f) {
+		Ferma aux = *this;
+		aux.sistemIrigatie = this->sistemIrigatie;
+		aux.numarRecolte = this->numarRecolte + f.numarRecolte;
+		if (aux.recolte != NULL) {
+			delete[]aux.recolte;
+		}
+		aux.recolte = new Recolta[aux.numarRecolte];
+		for (int i = 0; i < this->numarRecolte; i++) {
+			aux.recolte[i] = this->recolte[i];
+		}
+		for (int j = this->numarRecolte; j < aux.numarRecolte; j++) {
+			aux.recolte[j] = f.recolte[j - this->numarRecolte];
+		}
+		return aux;
+	}
+
+	Recolta& operator[](int index) {
+		if (index >= 0 && index < numarRecolte) {
+			return this->recolte[index];
+		}
+	}
+
+	Ferma operator!() {
+		Ferma aux = *this;
+		aux.sistemIrigatie = !aux.sistemIrigatie;
+		return aux;
+	}
+
+	void afisareFerma() {
+		cout << endl << "Ferma cu id-ul " << id << (sistemIrigatie ? " are sistem de irigatie mecanizat " : " nu are sistem de irigatie mecanizat ") << "si are un numar de " << numarRecolte << " recolte. Recoltele sunt: " << endl;
+		if (numarRecolte == 0) 
+			cout << "-";
+		else
+			for (int i = 0; i < numarRecolte; i++)
+				cout << recolte[i];
+		cout << endl;
+	}
+
+	int getId() {
+		return this->id;
+	}
+
+	void setSistemIrigatie(bool sistemIrigatie) {
+		this->sistemIrigatie = sistemIrigatie;
+	}
+
+	bool getSistemIrigatie() {
+		return this->sistemIrigatie;
+	}
+
+	void setNrRecolte(int numarRecolte, Recolta* recolte) {
+		if (numarRecolte > 0) {
+			this->numarRecolte = numarRecolte;
+			if (this->recolte != NULL) {
+				delete[]this->recolte;
+			}
+			this->recolte = new Recolta[numarRecolte];
+			for (int i = 0; i < numarRecolte; i++) {
+				this->recolte[i] = recolte[i];
+			}
+		}
+	}
+
+	int getNrRecolte() {
+		return this->numarRecolte;
+	}
+
+	Recolta* getRecolte() {
+		return this->recolte;
+	}
+};
+
 
 void main() {
 	Recolta::setCalitateDeReferinta("buna");
@@ -718,24 +856,26 @@ void main() {
 	Recolta recolta4(recolta2);
 	recolta4.afisareRecolta();
 
-	cout << endl << recolta4.getCalitateDeReferinta() << endl;
+	cout << endl << "Calitatea de referinta a recoltei4 este: " << recolta4.getCalitateDeReferinta() << endl;
 
-	cout << endl << recolta2.getNrSoiuri() << endl;
+	cout << endl << "Numarul de soiuri al recoltei2 este: " << recolta2.getNrSoiuri() << endl;
 
 	recolta4.setTipCultura("cartof");
-	cout << endl << recolta4.getTipCultura() << endl;
+	cout << endl << "Cultura recoltei4 este: " << recolta4.getTipCultura() << endl;
 
 	recolta4.setCantitate(176.7);
-	cout << endl << recolta4.getCantitate() << endl;
+	cout << endl << "Cantitatea recoltei4 este: " << recolta4.getCantitate() << endl;
 
 	int* vectorRecolta = new int [4] {6, 3, 4, 2};
 
 	recolta4.setNrZileRecoltare(4, vectorRecolta);
 	recolta4.afisareRecolta();
-
+	
 	delete[]vectorRecolta;
 
-	cout << endl << recolta4.getOrePeZi()[1] << endl;
+	cout << endl << "Numarul de zile in care s-a recoltat recolta4 este: " << recolta4.getNrZileRecoltare() << endl;
+
+	cout << endl << "Numarul de ore din ziua 2 in care s-a recoltat recolta4: " << recolta4.getOrePeZi()[1] << endl;
 
 	Recolta recolta5 = recolta2;
 	cout << recolta5;
@@ -752,29 +892,29 @@ void main() {
 	else
 		cout << endl << "Recolta 2 are o cantitate mai mica sau egala decat recolta 3" << endl;
 
-	cout << endl << recolta4[1] << endl;
+	cout << endl << "Numarul de ore din ziua 2 in care s-a recoltat recolta4: " << recolta4[1] << endl;
 	recolta4[1] = 4;
 	cout << recolta4;
-	cout << endl << recolta4[1] << endl;
+	cout << endl << "Noul numar de ore din ziua 2 in care s-a recoltat recolta4: " << recolta4[1] << endl;
 
-	cout << endl << getTimpMediuPeZi(recolta2) << endl;
+	cout << endl << "Timpul mediu pentru reolta2 este: " << getTimpMediuPeZi(recolta2) << endl;
 
 	recolta2 = recolta4++;
 	cout << recolta4;
 	cout << recolta2;
 
-	int numarRecolte;
-	cout << endl << "Introduceti numarul de recolte: ";
-	cin >> numarRecolte;
-	Recolta* vectorRecolte = new Recolta[numarRecolte];
-	for (int i = 0; i < numarRecolte; i++) {
-		cout << endl << "Detalii recolta " << i + 1 << ":" << endl;
-		cin >> vectorRecolte[i];
-	}
-	for (int i = 0; i < numarRecolte; i++) {
-		cout << vectorRecolte[i] << endl;
-	}
-	delete[]vectorRecolte;
+	//int numarRecolte;
+	//cout << endl << "Introduceti numarul de recolte: ";
+	//cin >> numarRecolte;
+	//Recolta* vectorRecolte = new Recolta[numarRecolte];
+	//for (int i = 0; i < numarRecolte; i++) {
+	//	cout << endl << "Detalii recolta " << i + 1 << ":" << endl;
+	//	cin >> vectorRecolte[i];
+	//}
+	//for (int i = 0; i < numarRecolte; i++) {
+	//	cout << vectorRecolte[i] << endl;
+	//}
+	//delete[]vectorRecolte;
 
 
 
@@ -800,15 +940,15 @@ void main() {
 	Livada livada4(livada2);
 	livada4.afisareLivada();
 
-	cout << endl << livada4.getScopLivada() << endl;
+	cout << endl << "Livada4 a fost plantata pentru:  " << livada4.getScopLivada() << endl;
 
-	cout << endl << livada1.getAnPlantatie() << endl;
+	cout << endl << "Livada1 a fost plantata in anul: " << livada1.getAnPlantatie() << endl;
 
 	livada4.setTipFructe("peri");
-	cout << endl << livada4.getTipFructe() << endl;
+	cout << endl << "Pomii din livada4 sunt: " << livada4.getTipFructe() << endl;
 
 	livada4.setRandamentAnual(56.4);
-	cout << endl << livada4.getRandamentAnual() << endl;
+	cout << endl << "Randamentul anual al livezii4 este: " << livada4.getRandamentAnual() << endl;
 
 	int* vectorLivada = new int[3] {11, 10, 12};
 
@@ -817,7 +957,9 @@ void main() {
 
 	delete[]vectorLivada;
 
-	cout << endl << livada4.getVechimePomi()[0] << endl;
+	cout << endl << "Numarul de pomi al livezii4 este: " << livada4.getNrPomi() << endl;
+
+	cout << endl << "Vechimea pomului 1 este: " << livada4.getVechimePomi()[0] << endl;
 
 	Livada livada5 = livada2;
 	cout << livada5;
@@ -829,19 +971,19 @@ void main() {
 	livada4 += livada2;
 	cout << livada4;
 
-	if (livada2 == livada4) 
+	if (livada2 == livada4)
 		cout << endl << "Livada 2 si livada 4 au acelasi randament anual si acelasi numar de pomi." << endl;
 	else
 		cout << endl << "Livada 2 si livada 4 au randamentul anual si numarul de pomi diferite." << endl;
 
-	cout << endl << livada2[2] << endl;
+	cout << endl << "Vechime pomului 3 a livezii2 este: " << livada2[2] << endl;
 	livada2[2] = 10;
 	cout << livada2;
-	cout << endl << livada2[2] << endl;
-	
+	cout << endl << "Noua vechime a pomului 3 a livezii2 este: " << livada2[2] << endl;
+
 	cout << endl << "Media vechimii pomilor de la 1 la 3 este:" << livada2(1, 3) << endl;
 
-	int numarLivezi;
+	/*int numarLivezi;
 	cout << endl << "Introduceti numarul de livezi: ";
 	cin >> numarLivezi;
 	Livada* vectorLivezi = new Livada[numarLivezi];
@@ -852,7 +994,7 @@ void main() {
 	for (int i = 0; i < numarLivezi; i++) {
 		cout << vectorLivezi[i] << endl;
 	}
-	delete[]vectorLivezi;
+	delete[]vectorLivezi;*/
 
 
 
@@ -875,18 +1017,18 @@ void main() {
 	Sol sol4(sol2);
 	sol4.afisareSol();
 
-	cout << endl << sol4.getPhOptim() << endl;
+	cout << endl << "Ph-ul optim pentru solul4 este: " << sol4.getPhOptim() << endl;
 
-	cout << endl << sol1.getAnPrimaCultura() << endl;
+	cout << endl << "Solul1 a avut prima cultura in anul: " << sol1.getAnPrimaCultura() << endl;
 
 	sol4.setTipSol("negru");
-	cout << endl << sol4.getTipSol() << endl;
+	cout << endl << "Solul4 este de tipul: " << sol4.getTipSol() << endl;
 
 	sol4.setFertilitate("foarte crescuta");
-	cout << endl << sol4.getFertilitate() << endl;
+	cout << endl << "Solul4 are fertilitatea: " << sol4.getFertilitate() << endl;
 
 	sol4.setSuprafataCultivata(22.3);
-	cout << endl << sol4.getSuprafataCultivata() << endl;
+	cout << endl << "Suprafata cultivata a solului4 este de: " << sol4.getSuprafataCultivata() << endl;
 
 	string* vectorSol = new string[2]{ "morcov", "ceapa" };
 	sol4.setNrCulturi(2, vectorSol);
@@ -894,7 +1036,9 @@ void main() {
 
 	delete[]vectorSol;
 
-	cout << endl << sol4.getTipCulturi(1) << endl;
+	cout << endl << "Numarul de culturi plantate pe solul4 este : " << sol4.getNrCulturi() << endl;
+
+	cout << endl << "Cultura 2 a solului4 a fost de: " << sol4.getTipCulturi(1) << endl;
 
 	Sol sol5 = sol2;
 	cout << sol5;
@@ -906,16 +1050,16 @@ void main() {
 	sol4 += sol6;
 	cout << sol4;
 
-	if (sol2 != sol3) 
+	if (sol2 != sol3)
 		cout << endl << "Solul 2 si solul 3 au fertilitate diferita." << endl;
 	else
 		cout << endl << "Solul 2 si solul 3 au aceeasi fertilitate." << endl;
 
 	cout << sol2;
-	cout << endl << sol2[0] << endl;
+	cout << endl << "Prima cultura a solului2 este: " << sol2[0] << endl;
 	sol2[0] = "conopida";
 	cout << sol2;
-	cout << endl << sol2[0] << endl;
+	cout << endl << "Noua prima cultura a solului2 este: " << sol2[0] << endl;
 
 
 	int culturiSol;
@@ -925,35 +1069,75 @@ void main() {
 	cout << sol2;
 	sol2 = sol2 + 3.2;
 	cout << sol2;
-	cout << endl << sol2.getSuprafataCultivata() << endl;
+	cout << endl << "Noua suprafata cultivata a solului2 este: " << sol2.getSuprafataCultivata() << endl;
 
-	int numarSoluri;
-	cout << endl << "Introduceti numarul de soluri: ";
-	cin >> numarSoluri;
-	Sol* vectorSoluri = new Sol[numarSoluri];
-	for (int i = 0; i < numarSoluri; i++) {
-		cout << endl << "Detalii sol " << i + 1 << ":" << endl;
-		cin >> vectorSoluri[i];
-	}
-	for (int i = 0; i < numarSoluri; i++) {
-		cout << vectorSoluri[i] << endl;
-	}
-	delete[]vectorSoluri;
+	//int numarSoluri;
+	//cout << endl << "Introduceti numarul de soluri: ";
+	//cin >> numarSoluri;
+	//Sol* vectorSoluri = new Sol[numarSoluri];
+	//for (int i = 0; i < numarSoluri; i++) {
+	//	cout << endl << "Detalii sol " << i + 1 << ":" << endl;
+	//	cin >> vectorSoluri[i];
+	//}
+	//for (int i = 0; i < numarSoluri; i++) {
+	//	cout << vectorSoluri[i] << endl;
+	//}
+	//delete[]vectorSoluri;
 
-	const int linii = 2;
-	const int coloane = 2;
-	Sol matriceSol[linii][coloane];
-	for (int i = 0; i < linii; i++) {
-		for (int j = 0; j < coloane; j++) {
-			cout << endl << "Detaliile solului [" << i + 1<< "][" << j + 1 <<"]: " << endl;
-			cin >> matriceSol[i][j];
-		}
-	}
-	for (int i = 0; i < linii; i++) {
-		for (int j = 0; j < coloane; j++) {
-			cout << endl << "Solul [" << i + 1 << "][" << j + 1 << "]: ";
-			cout << matriceSol[i][j] << " ";
-		}
-		cout << endl;
-	}
+	//const int linii = 2;
+	//const int coloane = 2;
+	//Sol matriceSol[linii][coloane];
+	//for (int i = 0; i < linii; i++) {
+	//	for (int j = 0; j < coloane; j++) {
+	//		cout << endl << "Detaliile solului [" << i + 1 << "][" << j + 1 << "]: " << endl;
+	//		cin >> matriceSol[i][j];
+	//	}
+	//}
+	//for (int i = 0; i < linii; i++) {
+	//	for (int j = 0; j < coloane; j++) {
+	//		cout << endl << "Solul [" << i + 1 << "][" << j + 1 << "]: ";
+	//		cout << matriceSol[i][j] << " ";
+	//	}
+	//	cout << endl;
+	//}
+
+
+
+	Ferma ferma1;
+	ferma1.afisareFerma();
+	
+	Recolta* recolte = new Recolta[3] {recolta3, recolta4, recolta5};
+
+	Ferma ferma2(1, true, 3, recolte);
+	ferma2.afisareFerma();
+
+	Ferma ferma3(ferma2);
+	ferma3.afisareFerma();
+
+	cout << endl << "Id-ul fermei1 este: " << ferma1.getId() << endl;
+
+	ferma3.setSistemIrigatie(false);
+	cout << endl << "Ferma3 " << (ferma3.getSistemIrigatie() ? "are" : "nu are") << " sistem de irigatie." << endl;
+	ferma3.afisareFerma();
+
+	Recolta* vectorFerma = new Recolta[2]{recolta2, recolta6};
+	ferma3.setNrRecolte(2, vectorFerma);
+	ferma3.afisareFerma();
+
+	delete[]vectorFerma;
+
+	cout << endl << "Numarul de recolte al fermei3 este: " << ferma3.getNrRecolte() << endl;
+
+	cout << endl << "Recolta1 a fermei3 este: " << ferma3.getRecolte()[0] << endl;
+
+	ferma1 = ferma2 + ferma3;
+	ferma1.afisareFerma();
+
+	cout << endl << "Recolta 3 a fermei1 este: " << ferma1[2] << endl;
+	ferma1[2] = recolta6;
+	cout << endl << "Noua recolta 3 a fermei1 este: " << ferma1[2] << endl;
+
+	ferma3.afisareFerma();
+	ferma3 = !ferma3;
+	ferma3.afisareFerma();
 }
