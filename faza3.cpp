@@ -1,4 +1,5 @@
 #include <iostream>
+#include<fstream>
 using namespace std;
 
 class Recolta
@@ -188,6 +189,33 @@ public:
 	friend ostream& operator<<(ostream& out, const Recolta& recolta);
 
 	friend istream& operator>>(istream& in, Recolta& recolta);
+
+	friend void scriereBinRecolta(ofstream& out, Recolta& recolta)
+	{
+		int lungimeTipCultura = recolta.tipCultura.length();
+		out.write((char*)&lungimeTipCultura, sizeof(int));
+		out.write(recolta.tipCultura.c_str(), lungimeTipCultura + 1);
+		out.write((char*)&recolta.cantitate, sizeof(float));
+		out.write((char*)&recolta.numarZileRecoltare, sizeof(int));
+		out.write((char*)recolta.orePeZi, sizeof(int) * recolta.numarZileRecoltare);
+	}
+
+	friend void citireBinRecolta(ifstream& in, Recolta& recolta) {
+		int lungime;
+		in.read((char*)&lungime, sizeof(int));
+		char* bufferTipCultura = new char[lungime + 1];
+		in.read(bufferTipCultura, lungime + 1);
+		recolta.tipCultura = bufferTipCultura;
+		delete[] bufferTipCultura;
+		in.read((char*)&recolta.cantitate, sizeof(float));
+		in.read((char*)&recolta.numarZileRecoltare, sizeof(int));
+		if (recolta.orePeZi != NULL) {
+			delete[] recolta.orePeZi;
+		}
+		recolta.orePeZi = new int[recolta.numarZileRecoltare];
+		in.read((char*)recolta.orePeZi, sizeof(int) * recolta.numarZileRecoltare);
+	}
+
 };
 
 string Recolta::calitateDeReferinta = "superioara";
@@ -213,7 +241,7 @@ ostream& operator<<(ostream& out, const Recolta& recolta) {
 	return out;
 }
 
- istream& operator>>(istream& in, Recolta& recolta) {
+istream& operator>>(istream& in, Recolta& recolta) {
 	cout << "Tip cultura: ";
 	in >> recolta.tipCultura;
 	cout << "Cantitate: ";
@@ -233,7 +261,6 @@ ostream& operator<<(ostream& out, const Recolta& recolta) {
 	}
 	return in;
 }
-
 
 class Livada
 {
@@ -421,6 +448,32 @@ public:
 	
 	friend ostream& operator<<(ostream& out, const Livada& livada);
 	friend istream& operator>>(istream& in, Livada& livada);
+
+	friend void scriereBinLivada(ofstream& out, Livada& livada)
+	{
+		int lungimeTipFructe = livada.tipFructe.length();
+		out.write((char*)&lungimeTipFructe, sizeof(int));
+		out.write(livada.tipFructe.c_str(), lungimeTipFructe + 1);
+		out.write((char*)&livada.randamentAnual, sizeof(float));
+		out.write((char*)&livada.numarPomi, sizeof(int));
+		out.write((char*)livada.vechimePomi, sizeof(int) * livada.numarPomi);
+	}
+
+	friend void citireBinLivada(ifstream& in, Livada& livada) {
+		int lungime;
+		in.read((char*)&lungime, sizeof(int));
+		char* bufferTipFructe = new char[lungime + 1];
+		in.read(bufferTipFructe, lungime + 1);
+		livada.tipFructe = bufferTipFructe;
+		delete[] bufferTipFructe;
+		in.read((char*)&livada.randamentAnual, sizeof(float));
+		in.read((char*)&livada.numarPomi, sizeof(int));
+		if (livada.vechimePomi != NULL) {
+			delete[] livada.vechimePomi;
+		}
+		livada.vechimePomi = new int[livada.numarPomi];
+		in.read((char*)livada.vechimePomi, sizeof(int) * livada.numarPomi);
+	}
 };
 
 string Livada::scopLivada = "consum";
@@ -664,6 +717,28 @@ public:
 
 	friend ostream& operator<<(ostream& out, const Sol& sol);
 	friend istream& operator >>(istream& in, Sol& sol);
+
+	friend ofstream& operator<<(ofstream& out, const Sol& sol) {
+		out << sol.tipSol << endl << sol.fertilitate << endl << sol.suprafataCultivata << endl << sol.numarCulturi << endl;
+		for (int i = 0; i < sol.numarCulturi; i++)
+			out << sol.tipCulturi[i] << " ";
+		out << endl;
+		return out;
+	}
+
+	friend ifstream& operator>>(ifstream& in, Sol& sol) {
+		in >> sol.tipSol;
+		in >> sol.fertilitate;
+		in >> sol.suprafataCultivata;
+		in >> sol.numarCulturi;
+		if (sol.tipCulturi != NULL)
+			delete[]sol.tipCulturi;
+		sol.tipCulturi = new string[sol.numarCulturi];
+		for (int i = 0; i < sol.numarCulturi; i++)
+			in >> sol.tipCulturi[i];
+		return in;
+	}
+
 };
 
 float Sol::phOptim = 6.8;
@@ -829,6 +904,50 @@ public:
 
 	Recolta* getRecolte() {
 		return this->recolte;
+	}
+
+	friend ostream& operator<<(ostream& out, const Ferma& ferma) {
+		out << endl << "Ferma cu id-ul " << ferma.id << (ferma.sistemIrigatie ? " are sistem de irigatie mecanizat " : " nu are sistem de irigatie mecanizat ") << "si are un numar de " << ferma.numarRecolte << " recolte. Recoltele sunt: " << endl;
+		if (ferma.numarRecolte == 0)
+			out << "-";
+		else
+			for (int i = 0; i < ferma.numarRecolte; i++)
+				out << ferma.recolte[i];
+		out << endl;
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, Ferma& ferma) {
+		cout << "Sitem de irigatie? 0-NU 1-DA: ";
+		in >> ferma.sistemIrigatie;
+		cout << "Numar recolte: ";
+		in >> ferma.numarRecolte;
+		if (ferma.recolte != NULL)
+			delete[]ferma.recolte;
+		ferma.recolte= new Recolta[ferma.numarRecolte];
+		for (int i = 0; i < ferma.numarRecolte; i++)
+			in >> ferma.recolte[i];
+		return in;
+	}
+
+	friend ofstream& operator<<(ofstream& out, const Ferma& ferma) {
+		out << "Sistem de irigatie:" << ferma.sistemIrigatie << endl << "Numar recolte:" << ferma.numarRecolte << endl;
+
+		for (int i = 0; i < ferma.numarRecolte; i++)
+			out << ferma.recolte[i] << " ";
+		out << endl;
+		return out;
+	}
+
+	friend ifstream& operator>>(ifstream& in, Ferma& ferma) {
+		in >> ferma.sistemIrigatie;
+		in >> ferma.numarRecolte;
+		if (ferma.recolte != NULL)
+			delete[]ferma.recolte;
+		ferma.recolte = new Recolta[ferma.numarRecolte];
+		for (int i = 0; i < ferma.numarRecolte; i++)
+			in >> ferma.recolte[i];
+		return in;
 	}
 };
 
@@ -1140,4 +1259,45 @@ void main() {
 	ferma3.afisareFerma();
 	ferma3 = !ferma3;
 	ferma3.afisareFerma();
+
+	/*ofstream fsol("soluri.txt",ios::out);
+	Sol s1;
+	cin >> s1;
+	fsol << s1;
+	fsol.close();
+	ifstream f1sol("soluri.txt", ios::in);
+	f1sol >> s1;
+	cout << s1;
+	f1sol.close();*/
+
+	/*ofstream fferma("ferme.txt", ios::out);
+	Ferma f1;
+	cin >> f1;
+	fferma << f1;
+	fferma.close();
+	ifstream f1ferma("ferme.txt", ios::in);
+	cout << f1;
+	f1ferma >> f1;
+	f1ferma.close();*/
+
+	/*ofstream frecolta("recolte.bin", ios::binary | ios::out);
+	Recolta r1;
+	cin >> r1;
+	frecolta.write((char*)&r1, sizeof(Recolta));
+	frecolta.close();
+	ifstream f1recolta("recolte.bin", ios::binary | ios::in);
+	f1recolta.read((char*)&r1, sizeof(Recolta));
+	cout << r1;
+	f1recolta.close();*/
+
+	/*ofstream flivada("livezi.bin", ios::binary | ios::out);
+	Livada l1;
+	cin >> l1;
+	flivada.write((char*)&l1, sizeof(Livada));
+	flivada.close();
+	ifstream f1livada("livezi.bin", ios::binary | ios::in);
+	f1livada.read((char*)&l1, sizeof(Livada));
+	cout << l1;
+	f1livada.close();*/
+
 }
