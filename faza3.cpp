@@ -190,32 +190,35 @@ public:
 
 	friend istream& operator>>(istream& in, Recolta& recolta);
 
-	friend void scriereBinRecolta(ofstream& out, Recolta& recolta)
-	{
-		int lungimeTipCultura = recolta.tipCultura.length();
-		out.write((char*)&lungimeTipCultura, sizeof(int));
-		out.write(recolta.tipCultura.c_str(), lungimeTipCultura + 1);
-		out.write((char*)&recolta.cantitate, sizeof(float));
-		out.write((char*)&recolta.numarZileRecoltare, sizeof(int));
-		out.write((char*)recolta.orePeZi, sizeof(int) * recolta.numarZileRecoltare);
+	void scriereBinRecolta(fstream& f) {
+		int lungimeTipCultura = tipCultura.length();
+		f.write((char*)&lungimeTipCultura, sizeof(int));
+		f.write(tipCultura.c_str(), lungimeTipCultura + 1);
+		f.write((char*)&this->cantitate, sizeof(float));
+		f.write((char*)&this->numarZileRecoltare, sizeof(int));
+		for (int i = 0; i < numarZileRecoltare; i++) {
+			f.write((char*)&this->orePeZi[i], sizeof(int));
+	}
 	}
 
-	friend void citireBinRecolta(ifstream& in, Recolta& recolta) {
+	void citireBinRecolta(fstream& f) {
 		int lungime;
-		in.read((char*)&lungime, sizeof(int));
+		f.read((char*)&lungime, sizeof(int));
 		char* bufferTipCultura = new char[lungime + 1];
-		in.read(bufferTipCultura, lungime + 1);
-		recolta.tipCultura = bufferTipCultura;
+		f.read(bufferTipCultura, lungime + 1);
+		this->tipCultura = bufferTipCultura;
 		delete[] bufferTipCultura;
-		in.read((char*)&recolta.cantitate, sizeof(float));
-		in.read((char*)&recolta.numarZileRecoltare, sizeof(int));
-		if (recolta.orePeZi != NULL) {
-			delete[] recolta.orePeZi;
+		f.read((char*)&this->cantitate, sizeof(float));
+		f.read((char*)&this->numarZileRecoltare, sizeof(int));
+		if (this->orePeZi != NULL) {
+			delete[] this->orePeZi;
 		}
-		recolta.orePeZi = new int[recolta.numarZileRecoltare];
-		in.read((char*)recolta.orePeZi, sizeof(int) * recolta.numarZileRecoltare);
+		this->orePeZi = new int[numarZileRecoltare];
+		for (int i = 0; i < numarZileRecoltare; i++) {
+			f.read((char*)&this->orePeZi[i], sizeof(int));
+		}
 	}
-
+	
 };
 
 string Recolta::calitateDeReferinta = "superioara";
@@ -449,30 +452,34 @@ public:
 	friend ostream& operator<<(ostream& out, const Livada& livada);
 	friend istream& operator>>(istream& in, Livada& livada);
 
-	friend void scriereBinLivada(ofstream& out, Livada& livada)
+	void scriereBinLivada(fstream& f)
 	{
-		int lungimeTipFructe = livada.tipFructe.length();
-		out.write((char*)&lungimeTipFructe, sizeof(int));
-		out.write(livada.tipFructe.c_str(), lungimeTipFructe + 1);
-		out.write((char*)&livada.randamentAnual, sizeof(float));
-		out.write((char*)&livada.numarPomi, sizeof(int));
-		out.write((char*)livada.vechimePomi, sizeof(int) * livada.numarPomi);
+		int lungimeTipFructe = tipFructe.length();
+		f.write((char*)&lungimeTipFructe, sizeof(int));
+		f.write(tipFructe.c_str(), lungimeTipFructe + 1);
+		f.write((char*)&this->randamentAnual, sizeof(float));
+		f.write((char*)&this->numarPomi, sizeof(int));
+		for (int i = 0; i < numarPomi; i++) {
+			f.write((char*)&this->vechimePomi[i], sizeof(int));
+		}
 	}
 
-	friend void citireBinLivada(ifstream& in, Livada& livada) {
+	void citireBinLivada(fstream& f) {
 		int lungime;
-		in.read((char*)&lungime, sizeof(int));
+		f.read((char*)&lungime, sizeof(int));
 		char* bufferTipFructe = new char[lungime + 1];
-		in.read(bufferTipFructe, lungime + 1);
-		livada.tipFructe = bufferTipFructe;
+		f.read(bufferTipFructe, lungime + 1);
+		this->tipFructe = bufferTipFructe;
 		delete[] bufferTipFructe;
-		in.read((char*)&livada.randamentAnual, sizeof(float));
-		in.read((char*)&livada.numarPomi, sizeof(int));
-		if (livada.vechimePomi != NULL) {
-			delete[] livada.vechimePomi;
+		f.read((char*)&this->randamentAnual, sizeof(float));
+		f.read((char*)&this->numarPomi, sizeof(int));
+		if (this->vechimePomi != NULL) {
+			delete[] this->vechimePomi;
 		}
-		livada.vechimePomi = new int[livada.numarPomi];
-		in.read((char*)livada.vechimePomi, sizeof(int) * livada.numarPomi);
+		this->vechimePomi = new int[numarPomi];
+		for (int i = 0; i < numarPomi; i++) {
+			f.read((char*)&this->vechimePomi[i], sizeof(int));
+		}
 	}
 };
 
@@ -1280,23 +1287,28 @@ void main() {
 	f1ferma >> f1;
 	f1ferma.close();*/
 
-	/*ofstream frecolta("recolte.bin", ios::binary | ios::out);
-	Recolta r1;
+	
+	/*Recolta r1;
 	cin >> r1;
+	fstream frecolta("recolte.bin", ios::binary | ios::out);
 	frecolta.write((char*)&r1, sizeof(Recolta));
+	r1.scriereBinRecolta(frecolta);
 	frecolta.close();
-	ifstream f1recolta("recolte.bin", ios::binary | ios::in);
+	fstream f1recolta("recolte.bin", ios::binary | ios::in);
 	f1recolta.read((char*)&r1, sizeof(Recolta));
+	r1.citireBinRecolta(f1recolta);
 	cout << r1;
 	f1recolta.close();*/
 
-	/*ofstream flivada("livezi.bin", ios::binary | ios::out);
-	Livada l1;
+	/*Livada l1;
 	cin >> l1;
+	fstream flivada("livezi.bin", ios::binary | ios::out);
 	flivada.write((char*)&l1, sizeof(Livada));
+	l1.scriereBinLivada(flivada);
 	flivada.close();
-	ifstream f1livada("livezi.bin", ios::binary | ios::in);
+	fstream f1livada("livezi.bin", ios::binary | ios::in);
 	f1livada.read((char*)&l1, sizeof(Livada));
+	l1.citireBinLivada(f1livada);
 	cout << l1;
 	f1livada.close();*/
 
