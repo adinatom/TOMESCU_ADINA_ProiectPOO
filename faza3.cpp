@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include<fstream>
 using namespace std;
@@ -769,7 +770,7 @@ ostream& operator<<(ostream& out, const Sol& sol) {
 }
 
 istream& operator>>(istream& in, Sol& sol) {
-	cout << "Tip sol: ";
+	cout << endl << "Tip sol: ";
 	in >> sol.tipSol;
 	cout << "Fertilitate: ";
 	in >> sol.fertilitate;
@@ -958,6 +959,240 @@ public:
 	}
 };
 
+class LivadaIrigata : public Livada {
+private:
+	float cantitateApaAnuala;
+	char* sistemIrigare;
+public:
+
+	LivadaIrigata() : Livada("piersici", 0) {
+		this->cantitateApaAnuala = 0;
+		this->sistemIrigare = new char[strlen("picurare") + 1];
+		strcpy_s(this->sistemIrigare, strlen("picurare") + 1, "picurare");
+	}
+
+	LivadaIrigata(float cantitateApaAnuala, const char* sistemIrigare, string tipFructe) : Livada(tipFructe, 0) {
+		this->cantitateApaAnuala = cantitateApaAnuala;
+		this->sistemIrigare = new char[strlen(sistemIrigare) + 1];
+		strcpy_s(this->sistemIrigare, strlen(sistemIrigare) + 1, sistemIrigare);
+	}
+
+	LivadaIrigata(float cantitateApaAnuala, const char* sistemIrigare, string tipFructe, float randamentAnual, int numarPomi, int* vechimePomi) : Livada(tipFructe, randamentAnual, numarPomi, vechimePomi) {
+		this->cantitateApaAnuala = cantitateApaAnuala;
+		this->sistemIrigare = new char[strlen(sistemIrigare) + 1];
+		strcpy_s(this->sistemIrigare, strlen(sistemIrigare) + 1, sistemIrigare);
+	}
+
+	LivadaIrigata(const LivadaIrigata& li) : Livada(li) {
+		this->cantitateApaAnuala = li.cantitateApaAnuala;
+		this->sistemIrigare = new char[strlen(li.sistemIrigare) + 1];
+		strcpy_s(this->sistemIrigare, strlen(li.sistemIrigare) + 1, li.sistemIrigare);
+	}
+
+	LivadaIrigata operator=(const LivadaIrigata& li) {
+		if (this != &li) {
+			Livada::operator=(li);
+			if (this->sistemIrigare != NULL) {
+				delete[]this->sistemIrigare;
+			}
+			this->cantitateApaAnuala = li.cantitateApaAnuala;
+			this->sistemIrigare = new char[strlen(li.sistemIrigare) + 1];
+			strcpy_s(this->sistemIrigare, strlen(li.sistemIrigare) + 1, li.sistemIrigare);
+		}
+		return *this;
+	}
+
+	~LivadaIrigata() {
+		if (this->sistemIrigare != NULL) {
+			delete[]this->sistemIrigare;
+		}
+	}
+
+	void setCantitateApaAnuala(float cantitateApaAnuala) {
+		if (cantitateApaAnuala > 0) {
+			this->cantitateApaAnuala = cantitateApaAnuala;
+		}
+	}
+
+	float getCantitateApaAnuala() {
+		return this->cantitateApaAnuala;
+	}
+
+	void setSistemIrigare(const char* sistemIrigare) {
+		if (this->sistemIrigare != NULL) {
+			delete[]this->sistemIrigare;
+		}
+		this->sistemIrigare = new char[strlen(sistemIrigare) + 1];
+		strcpy_s(this->sistemIrigare, strlen(sistemIrigare) + 1, sistemIrigare);
+	}
+
+	char* getSistemIrigare() {
+		return this->sistemIrigare;
+	}
+
+	friend ostream& operator<<(ostream& out, const LivadaIrigata& li) {
+		out << (Livada)li;
+		out << "Cantitate apa anuala folosita: " << li.cantitateApaAnuala << "m cubi" << endl;
+		out << "Sistemul de irigare folosit: " << li.sistemIrigare << endl;
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, LivadaIrigata& li) {
+		in >> (Livada&)li;
+		cout << "Cantitatea anuala de apa folosita: ";
+		in >> li.cantitateApaAnuala;
+		if (li.sistemIrigare)
+		{
+			delete[]li.sistemIrigare;
+		}
+		cout << "Sistem de irigare folosit: ";
+		char buffer[30];
+		in >> buffer;
+		li.sistemIrigare = new char[strlen(buffer) + 1];
+		strcpy_s(li.sistemIrigare, strlen(buffer) + 1, buffer);
+		return in;
+	}
+
+	//upcasting
+	LivadaIrigata(const Livada& l) :Livada(l) {
+		this->cantitateApaAnuala = 235.5;
+		this->sistemIrigare = new char[strlen("automatizat")+1];
+		strcpy_s(this->sistemIrigare, strlen("automatizat") + 1, "automatizat");
+	}
+};
+
+class SolPoluat : public Sol {
+private:
+	string tipPoluare;
+	int numarDeseuri;
+	string* deseuri;
+public:
+
+	SolPoluat() :Sol() {
+		this->tipPoluare = "-";
+		this->numarDeseuri = 0;
+		this->deseuri = NULL;
+	}
+
+	SolPoluat(int numarDeseuri, string* deseuri, string tipSol ) :Sol(tipSol, "medie", 0) {
+		this->tipPoluare = "biologica";
+		this->numarDeseuri = numarDeseuri;
+		this->deseuri = new string[numarDeseuri];
+		for (int i = 0; i < numarDeseuri; i++) {
+			this->deseuri[i] = deseuri[i];
+		}
+	}
+
+	SolPoluat(string tipPoluare, int numarDeseuri, string* deseuri, string tipSol, string fertilitate, float suprafataCultivata, int numarCulturi, string* tipCulturi) : Sol(tipSol, fertilitate, suprafataCultivata, numarCulturi, tipCulturi) {
+		this->tipPoluare = tipPoluare;
+		this->numarDeseuri = numarDeseuri;
+		this->deseuri = new string[numarDeseuri];
+		for (int i = 0; i < numarDeseuri; i++) {
+			this->deseuri[i] = deseuri[i];
+		}
+	}
+
+	SolPoluat(const SolPoluat& sp) :Sol(sp) {
+		this->tipPoluare = sp.tipPoluare;
+		this->numarDeseuri = sp.numarDeseuri;
+		this->deseuri = new string[numarDeseuri];
+		for (int i = 0; i < numarDeseuri; i++) {
+			this->deseuri[i] = sp.deseuri[i];
+		}
+	}
+
+	SolPoluat operator=(const SolPoluat& sp) {
+		if (this != &sp) {
+			Sol::operator=(sp);
+			if (this->deseuri != NULL) {
+				delete[]this->deseuri;
+			}
+			this->tipPoluare = sp.tipPoluare;
+			this->numarDeseuri = sp.numarDeseuri;
+			this->deseuri = new string[numarDeseuri];
+			for (int i = 0; i < numarDeseuri; i++) {
+				this->deseuri[i] = sp.deseuri[i];
+			}
+		}
+		return *this;
+	}
+
+	~SolPoluat() {
+		if (this->deseuri != NULL) {
+			delete[]this->deseuri;
+		}
+	}
+
+	void setTipPoluare(string tipPoluare) {
+		if (tipPoluare.length() != 0) {
+			this->tipPoluare = tipPoluare;
+		}
+	}
+
+	string getTipPoluare() {
+		return this->tipPoluare;
+	}
+
+	void setNrDeseuri(int numarDeseuri, string* deseuri) {
+		if (numarDeseuri > 0) {
+			this->numarDeseuri = numarDeseuri;
+		}
+		if (this->deseuri != NULL) {
+			delete[]this->deseuri;
+		}
+		this->deseuri = new string[numarDeseuri];
+		for (int i = 0; i < numarDeseuri; i++) {
+			this->deseuri[i] = deseuri[i];
+		}
+	}
+
+	int getNrDeseuri() {
+		return this->numarDeseuri;
+	}
+
+	string* getDeseuri() {
+		return this->deseuri;
+	}
+
+	friend ostream& operator<<(ostream& out, const SolPoluat& sp) {
+		out << (Sol)sp;
+		out << "Tipul de poluare: " << sp.tipPoluare  << endl;
+		out << "Numarul desurilor: " << sp.numarDeseuri << endl;
+		out << "Deseurile sunt: ";
+		if (sp.numarDeseuri == 0)
+			out << "-";
+		else
+			for (int i = 0; i < sp.numarDeseuri; i++)
+				out << sp.deseuri[i] << " ";
+		out << endl;
+		return out;
+	}
+
+	friend istream& operator>>(istream& in, SolPoluat& sp) {
+		in >> (Sol&)sp;
+		cout << "Tipul de poluare: ";
+		in >> sp.tipPoluare;
+		cout << "Numarul desurilor: ";
+		in >> sp.numarDeseuri;
+		if (sp.deseuri)
+		{
+			delete[]sp.deseuri;
+		}
+		sp.deseuri = new string[sp.numarDeseuri];
+		for (int i = 0; i < sp.numarDeseuri; i++) {
+			cout << "Deseul " << i + 1 << ": ";
+			in >> sp.deseuri[i];
+		}
+		return in;
+	}
+
+	//upcasting
+	SolPoluat(const Sol& s) :Sol(s) {
+		this->tipPoluare = "fara poluare";
+		this->numarDeseuri = 0;
+		this->deseuri = NULL;
+	}
+};
 
 void main() {
 	Recolta::setCalitateDeReferinta("buna");
@@ -1312,4 +1547,82 @@ void main() {
 	cout << l1;
 	f1livada.close();*/
 
+	
+	
+	LivadaIrigata li1;
+	cout << li1;
+
+	LivadaIrigata li2(0, "microasperisie", "gutui");
+	cout << li2;
+
+	int* vectorLivadaIrigata = new int[3] {10, 11, 9};
+	LivadaIrigata li3(300.5, "fertirigare", "gutui", 55.5, 3, vectorLivadaIrigata);
+	cout << li3;
+
+	LivadaIrigata li4(li3);
+	cout << li4;
+	
+	LivadaIrigata li5;
+	li5 = li4;
+	cout << li5;
+
+	li3.setCantitateApaAnuala(299.2);
+	cout << endl << "Cantitatea de apa anuala folosita pentru livada irigata 3: " << li3.getCantitateApaAnuala() << endl;
+
+	li3.setSistemIrigare("pompare");
+	cout << endl << "Sistemul de irigare folosit pentru livada irigata 3: " << li3.getSistemIrigare() << endl;
+
+	cout << endl << "Tipul de pomi fructiferi din livada irigata 3: " << li3.getTipFructe() << endl;
+
+	int* vectorPomi = new int[4] {8, 12, 12, 10};
+	li3.setNrPomi(4, vectorPomi);
+	
+	delete[]vectorPomi;
+
+	cout << endl << "Numarul de pomi din livada irigata 3: " << li3.getNrPomi() << endl;
+
+	cout << li3;
+	
+	LivadaIrigata li6(livada6);
+	cout << li6;
+
+
+
+	SolPoluat sp1;
+	cout << sp1;
+
+	string* vectorSolPoluat1 = new string[2]{ "bacterii", "virusi" };
+	SolPoluat sp2(2, vectorSolPoluat1, "argilos");
+	cout << sp2;
+
+	string* vectorSolPoluat2 = new string[2]{ "otel", "petrol" };
+	string* culturi = new string[2]{ "ceapa", "usturoi" };
+	SolPoluat sp3("industriala", 2, vectorSolPoluat2, "nisipos", "scazuta", 34.6, 2, culturi);
+	cout << sp3;
+
+	SolPoluat sp4(sp3);
+	cout << sp3;
+
+	SolPoluat sp5;
+	sp5 = sp4;
+	cout << sp5;
+
+	sp3.setTipPoluare("urbana");
+	cout << endl << "Tipul de poluare pentru solul poluat 3: " << sp3.getTipPoluare()<< endl;
+
+	string* deseuri = new string[3] { "sticla", "plastic", "hartie"};
+	sp3.setNrDeseuri(3, deseuri);
+	delete[]deseuri;
+
+	cout << endl << "Numarul de deseuri continut de solul poluat 3: " << sp3.getNrDeseuri() << endl;
+
+	cout << endl << "Primul deseu din solul poluat 3: " << sp3.getDeseuri()[0] << endl;
+
+	cout << sp3;
+
+	cout << endl << "Prima cultura a solului poluat 3: " << sp3.getTipCulturi(0) << endl;
+
+	SolPoluat sp6(sol6);
+	cout << sp6;
+	
 }
